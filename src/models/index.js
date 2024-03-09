@@ -27,6 +27,9 @@ const config = {
   database: process.env.DB_NAME,
   host: process.env.DB_HOST,
   dialect: "mysql",
+  dialectOptions: {
+    insecureAuth: true, 
+  },
   pool: {
     max: 5,
     min: 0,
