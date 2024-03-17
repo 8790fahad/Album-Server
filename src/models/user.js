@@ -17,7 +17,6 @@ export default (sequelize, DataTypes) => {
       },
       phone: {
         type: DataTypes.STRING,
-        unique: true,
         allowNull: true, 
       },
       dob: {
