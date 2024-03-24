@@ -19,6 +19,10 @@ export default (sequelize, DataTypes) => {
         type: DataTypes.STRING,
         allowNull: true, 
       },
+      email: {
+        type: DataTypes.STRING,
+        allowNull: true, 
+      },
       dob: {
         type: DataTypes.DATE,
         allowNull: false,

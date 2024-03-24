@@ -16,6 +16,7 @@ const create = (req, res) => {
     image = "",
     username = "",
     password = "",
+    email = "",
   } = req.body;
 
   User.findAll({ where: { username } }).then((user) => {
@@ -30,6 +31,7 @@ const create = (req, res) => {
         image,
         username,
         password,
+        email,
       };
       bcrypt.genSalt(10, (err, salt) => {
         bcrypt.hash(newUser.password, salt, (err, hash) => {
@@ -106,6 +108,7 @@ const login = (req, res) => {
                   success: true,
                   token: "Bearer " + token,
                   role: user[0].dataValues.role,
+                  user: user[0].dataValues,
                 });
               }
             );
