@@ -7,6 +7,84 @@ const User = db.User;
 import validateRegisterForm from "../validation/register";
 import validateLoginForm from "../validation/login";
 import { Op } from "sequelize";
+import moment from "moment";
+import { transporter } from "..";
+
+const mailOptions = ({
+  in_from = "",
+  in_to = "",
+  subject = "",
+  context = {},
+  template_name = "",
+}) => {
+  return {
+    from: in_from,
+    to: in_to,
+    subject: subject,
+    template: template_name,
+    context: context,
+  };
+};
+
+const verifyToken = (req, res) => {
+  const { token } = req.params;
+  jwt.verify(token, process.env.JWT_SECRET, (err, decoded) => {
+    if (err) {
+      return res.json({
+        success: false,
+        msg: "Failed to authenticate token.",
+        err,
+      });
+    }
+    const { username } = decoded;
+    User.findAll({ where: { username } })
+      .then((user) => {
+        if (!user.length) {
+          return res.json({ msg: "user not found" });
+        }
+        res.json({
+          success: true,
+          user: user[0],
+        });
+      })
+      .catch((err) => {
+        console.log(err);
+        res.status(500).json({ err });
+      });
+  });
+};
+
+const resetPassword = (req, res) => {
+  const { username, password, newPassword } = req.body;
+  User.findOne({ where: { username } })
+    .then((user) => {
+      if (!user) {
+        return res.status(404).json({ msg: "User not found", success: false });
+      }
+      bcrypt.compare(password, user.password).then((isMatch) => {
+        if (!isMatch) {
+          return res
+            .status(400)
+            .json({ msg: "Incorrect password", success: false });
+        }
+        bcrypt.genSalt(10, (err, salt) => {
+          bcrypt.hash(newPassword, salt, (err, hash) => {
+            if (err) throw err;
+            user.password = hash;
+            user
+              .save()
+              .then(() =>
+                res
+                  .status(200)
+                  .json({ msg: "Password reset successful", success: true })
+              )
+              .catch((err) => res.status(500).json({ err, success: false }));
+          });
+        });
+      });
+    })
+    .catch((err) => res.status(500).json({ err }));
+};
 
 const create = (req, res) => {
   let {
@@ -40,7 +118,45 @@ const create = (req, res) => {
           newUser.password = hash;
           User.create(newUser)
             .then((user) => {
-              res.json({ user });
+              jwt.sign(
+                {
+                  username,
+                  email,
+                  date: moment().format("YYYY-MM-DD hh:mm:ss"),
+                },
+                process.env.JWT_SECRET,
+                {
+                  expiresIn: 3600,
+                },
+                (err, token) => {
+                  console.log(err);
+                  console.log(token);
+                  console.log(process.env.YOUR_EMAIL_NAME);
+                  transporter.sendMail(
+                    mailOptions({
+                      from: "no-reply@nexifour.com",
+                      to: email,
+                      subject: "Please confirm your email",
+                      template_name: "confirmationMail",
+                      context: {
+                        name: `${firstname} ${lastname}`,
+                        link: `https://album.nexifour.com/email-confirmed?token=${token}`,
+                      },
+                    }),
+                    function (error, info) {
+                      if (error) {
+                        res.status(500).json({ error });
+                      } else {
+                        res.status(200).json({
+                          success: true,
+                          message: "email sent",
+                          info: info.response,
+                        });
+                      }
+                    }
+                  );
+                }
+              );
             })
             .catch((err) => {
               res.status(500).json({ err });
@@ -102,7 +218,7 @@ const login = (req, res) => {
 
             jwt.sign(
               payload,
-              "secret",
+              process.env.JWT_SECRET,
               {
                 expiresIn: 3600,
               },
@@ -174,4 +290,13 @@ const deleteUser = (req, res) => {
     .catch((err) => res.status(500).json({ msg: "Failed to delete!" }));
 };
 
-export { create, login, findAllUsers, findByUsername, update, deleteUser };
+export {
+  create,
+  login,
+  findAllUsers,
+  findByUsername,
+  verifyToken,
+  update,
+  deleteUser,
+  resetPassword,
+};

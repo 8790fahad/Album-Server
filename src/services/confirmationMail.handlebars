@@ -5,55 +5,110 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Nexifour Album | Verify email address</title>
     <link
-      href="https://fonts.googleapis.com/css2?family=Fredoka:wght@300..700&family=Open+Sans:ital,wght@0,300..800;1,300..800&family=Raleway:ital,wght@0,100..900;1,100..900&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Inter+Tight:ital,wght@0,100..900;1,100..900&display=swap"
       rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
     />
     <style>
       * {
-        font-family: "Raleway", sans-serif;
+        font-family: "Inter Tight", sans-serif;
+      }
+      @media (max-width: 575.98px) {
+        ._footer {
+          display: flex;
+          flex-direction: column;
+        }
       }
     </style>
   </head>
-  <body style="font-family: Arial, Helvetica, sans-serif">
-    <img
-      src="https://res.cloudinary.com/dx5ilizca/image/upload/v1710880420/Nexifour_8_bnpphs.png"
-      alt="Nexifour Album logo"
-      style="width: 250px; margin-top: 50px; margin: 10px;"
-    />
-    <div style="margin: 10px">
-      <h1 style="font-weight: 900">Verify Email Address</h1>
-      <p style="margin: 0">Hello Yasir Ado Hassan,</p>
-      <p>
-        Thanks for signing up to our platform, we are thrilled to have you with
-        us.
-      </p>
 
-      <a href=" https://api...">
-        <button
-          style="
-            background-color: #0d6efd;
-            color: white;
-            padding: 10px;
-            border-radius: 5px;
-            border: none;
-            cursor: pointer;
-          "
+  <body
+    style="
+      font-family: Arial, Helvetica, sans-serif;
+      background-color: rgb(236, 236, 236);
+    "
+    class="d-flex align-items-center justify-content-center"
+  >
+    <div>
+      <div class="text-center">
+        <img
+          src="https://res.cloudinary.com/dcfqfhsuv/image/upload/v1711274624/na-black._b9sx8q.png"
+          alt="Nexifour Album logo"
+          style="width: 250px; margin-top: 50px; margin: 10px"
+        />
+      </div>
+      <div>
+        <div
+          class="p-5"
+          style="margin: 10px; background-color: rgb(255, 255, 255)"
         >
-          Verify email address
-        </button>
-      </a>
-
-      <p style="margin-top: 50px; color: grey; font-size: 12px">
-        Copyright © <span id="currentYear"></span> Nexifour Album. All rights
-        reserved.
-      </p>
+          <p><b>Hello {name},</b></p>
+          <p>
+            Thanks for signing up to our platform, we are thrilled to have you
+            with us.
+          </p>
+          <p>
+            Before we begin, we need to make sure that it is you. Please click
+            below to verify your email address.
+          </p>
+          <a href="{{link}}">
+            <button
+              class="mt-5"
+              style="
+                background-color: #0d6efd;
+                color: white;
+                padding: 10px;
+                border-radius: 5px;
+                border: none;
+                cursor: pointer;
+              "
+            >
+              Verify email address
+            </button>
+          </a>
+          <div class="mt-5 small text-secondary">
+            <p>Please do not reply to this email.</p>
+            <p>
+              You received this email because you submitted your email address
+              on the Nexifour Album website during the registration process.
+              <br />
+              If you did not register, please ignore this email.
+            </p>
+          </div>
+        </div>
+      </div>
+      <div
+        class="d-flex align-items-center justify-content-between mt-5 _footer"
+      >
+        <img
+          src="https://res.cloudinary.com/dcfqfhsuv/image/upload/v1711274624/na-black._b9sx8q.png"
+          alt="Nexifour Album logo"
+          style="width: 150px; margin-top: 50px; margin: 10px"
+        />
+        <p style="margin-top: 50px; margin: 0; color: grey; font-size: 12px">
+          Copyright © <span id="currentYear"></span> Nexifour Album. All rights
+          reserved.
+        </p>
+        <div style="font-size: 20px" class="text-secondary">
+          <i class="fa-brands fa-square-facebook" style="cursor: pointer"></i>
+          <i class="fa-brands fa-tiktok" style="cursor: pointer"></i>
+          <i class="fa-brands fa-square-instagram" style="cursor: pointer"></i>
+          <i class="fa-brands fa-square-twitter" style="cursor: pointer"></i>
+          <i class="fa-brands fa-linkedin" style="cursor: pointer"></i>
+        </div>
+      </div>
     </div>
     <script>
-      // Get the current year
       var currentYear = new Date().getFullYear();
-
-      // Update the content of the placeholder element
       document.getElementById("currentYear").textContent = currentYear;
     </script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script
+      src="https://kit.fontawesome.com/94b3f98cfe.js"
+      crossorigin="anonymous"
+    ></script>
   </body>
 </html>

@@ -8,6 +8,8 @@ import {
   update,
   deleteUser,
   findByUsername,
+  verifyToken,
+  resetPassword,
 } from "../controllers/user";
 
 module.exports = (app) => {
@@ -36,6 +38,8 @@ module.exports = (app) => {
     allowOnly(config.accessLevels.admin, findById)
   );
 
+  app.get("/api/users/verify-token/:token", verifyToken);
+  app.post("/api/users/reset-password", resetPassword);
   // update a user with id
   app.put(
     "/api/users/:userId",
