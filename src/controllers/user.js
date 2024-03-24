@@ -6,6 +6,7 @@ import db from "../models";
 const User = db.User;
 import validateRegisterForm from "../validation/register";
 import validateLoginForm from "../validation/login";
+import { Op } from "sequelize";
 
 const create = (req, res) => {
   let {
@@ -66,19 +67,21 @@ const login = (req, res) => {
   const { errors, isValid } = validateLoginForm(req.body);
 
   // check validation
-  if (!isValid) {
-    return res.status(400).json(errors);
-  }
+  // if (!isValid) {
+  //   return res.status(400).json(errors);
+  // }
 
   const { email, password } = req.body;
-
+  console.log(req.body);
   User.findAll({
     where: {
-      email,
+      [Op.or]: [{ username: email }, { email }],
     },
+    limit: 1,
   })
     .then((user) => {
       //check for user
+      console.log(user);
       if (!user.length) {
         errors.email = "User not found!";
         return res.status(404).json(errors);
