@@ -11,6 +11,7 @@ import {
   verifyToken,
   resetPassword,
   verifyEmail,
+  deActivateAccount,
 } from "../controllers/user";
 
 module.exports = (app) => {
@@ -41,7 +42,8 @@ module.exports = (app) => {
 
   app.get("/api/users/verify-token/:token", verifyToken);
   app.post("/api/users/reset-password", resetPassword);
-  app.get('/api/users/verify-email/:token',verifyEmail)
+  app.get('/api/users/verify-email/:token',verifyEmail);
+  app.put("/api/users/de-activate-account",deActivateAccount)
   // update a user with id
   app.put(
     "/api/users/:userId",

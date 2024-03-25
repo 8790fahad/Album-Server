@@ -182,7 +182,7 @@ const verifyEmail = (req, res) => {
     const { username, date } = decoded;
     console.log(date);
 
-    const currentDate = moment()
+    const currentDate = moment();
     const dateToCompare = moment(date);
     const hoursDifference = currentDate.diff(dateToCompare, "hours");
     if (hoursDifference >= 24) {
@@ -215,6 +215,14 @@ const verifyEmail = (req, res) => {
         res.status(500).json({ err });
       });
   });
+};
+const deActivateAccount = (req, res) => {
+  const { username } = req.body;
+  User.update({ status: "suspended" }, { where: { username } })
+    .then((user) => {
+      res.json({ success: true, message: "Updated successfully", user });
+    })
+    .catch((err) => res.status(500).json({ err }));
 };
 const findByUsername = (req, res) => {
   const username = req.params.username;
@@ -349,4 +357,5 @@ export {
   deleteUser,
   resetPassword,
   verifyEmail,
+  deActivateAccount,
 };
