@@ -130,12 +130,10 @@ const create = (req, res) => {
                 },
                 (err, token) => {
                   console.log(err);
-                  console.log(token);
-                  console.log(process.env.YOUR_EMAIL_NAME);
                   transporter.sendMail(
                     mailOptions({
-                      from: "no-reply@nexifour.com",
-                      to: email,
+                      in_from: '"NEXIFOUR ALBUM" <from@example.com>',
+                      in_to: email,
                       subject: "Please confirm your email",
                       template_name: "confirmationMail",
                       context: {
@@ -145,7 +143,11 @@ const create = (req, res) => {
                     }),
                     function (error, info) {
                       if (error) {
-                        res.status(500).json({ error });
+                        res.status(500).json({
+                          success: true,
+                          message: "email sent",
+                          error,
+                        });
                       } else {
                         res.status(200).json({
                           success: true,
@@ -167,6 +169,53 @@ const create = (req, res) => {
   });
 };
 
+const verifyEmail = (req, res) => {
+  const { token } = req.params;
+  jwt.verify(token, process.env.JWT_SECRET, (err, decoded) => {
+    if (err) {
+      return res.json({
+        success: false,
+        msg: "Failed to authenticate token.",
+        err,
+      });
+    }
+    const { username, date } = decoded;
+    console.log(date);
+
+    const currentDate = moment()
+    const dateToCompare = moment(date);
+    const hoursDifference = currentDate.diff(dateToCompare, "hours");
+    if (hoursDifference >= 24) {
+      return res.json({ success: false, msg: "The link already expired" });
+    }
+    User.findAll({ where: { username } })
+      .then((user) => {
+        if (!user.length) {
+          return res.json({ success: false, msg: "user not found" });
+        }
+        if (user[0].status === "verified") {
+          return res.json({ success: false, msg: "already verified" });
+        } else {
+          User.update({ status: "verified" }, { where: { username } })
+            .then((user) => {
+              res.json({
+                success: true,
+                msg: "verified successfully",
+                user: user,
+              });
+            })
+            .catch((err) => {
+              console.log(err);
+              res.status(500).json({ err });
+            });
+        }
+      })
+      .catch((err) => {
+        console.log(err);
+        res.status(500).json({ err });
+      });
+  });
+};
 const findByUsername = (req, res) => {
   const username = req.params.username;
   User.findAll({ where: { username } })
@@ -299,4 +348,5 @@ export {
   update,
   deleteUser,
   resetPassword,
+  verifyEmail,
 };

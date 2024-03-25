@@ -18,13 +18,22 @@ app.set("view engine", "ejs");
 app.use(express.static(__dirname + "/public"));
 
 app.use(cors());
-const transporter = nodemailer.createTransport({
-  host: "sent.smtp.mailtrap.io",
+// const transporter = nodemailer.createTransport({
+//   host: "sent.smtp.mailtrap.io",
+//   port: 2525,
+//   auth: {
+//     user: process.env.YOUR_EMAIL_NAME,
+//     pass: process.env.YOUR_EMAIL_PASS,
+//   },
+// });
+
+var transporter = nodemailer.createTransport({
+  host: "sandbox.smtp.mailtrap.io",
   port: 2525,
   auth: {
-    user: process.env.YOUR_EMAIL_NAME,
-    pass: process.env.YOUR_EMAIL_PASS,
-  },
+    user: "1aa5732fb90c78",
+    pass: "5c33c96aa360d5"
+  }
 });
 
 const handlebarsOptions = {

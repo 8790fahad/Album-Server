@@ -10,6 +10,7 @@ import {
   findByUsername,
   verifyToken,
   resetPassword,
+  verifyEmail,
 } from "../controllers/user";
 
 module.exports = (app) => {
@@ -40,6 +41,7 @@ module.exports = (app) => {
 
   app.get("/api/users/verify-token/:token", verifyToken);
   app.post("/api/users/reset-password", resetPassword);
+  app.get('/api/users/verify-email/:token',verifyEmail)
   // update a user with id
   app.put(
     "/api/users/:userId",

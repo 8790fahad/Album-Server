@@ -17,11 +17,11 @@ export default (sequelize, DataTypes) => {
       },
       phone: {
         type: DataTypes.STRING,
-        allowNull: true, 
+        allowNull: true,
       },
       email: {
         type: DataTypes.STRING,
-        allowNull: true, 
+        allowNull: true,
       },
       dob: {
         type: DataTypes.DATE,
@@ -50,6 +50,14 @@ export default (sequelize, DataTypes) => {
       about: {
         type: DataTypes.STRING,
         allowNull: true,
+      },
+      status: {
+        type: DataTypes.STRING,
+        allowNull: false,
+        defaultValue: "waiting", // Default value set to 'waiting'
+        validate: {
+          isIn: [["verified", "suspended", "waiting"]], // Ensures status is one of these values
+        },
       },
       marital_status: {
         type: DataTypes.STRING,
@@ -86,7 +94,6 @@ export default (sequelize, DataTypes) => {
     },
     {}
   );
-  
 
   User.associate = function (models) {
     // associations go here
