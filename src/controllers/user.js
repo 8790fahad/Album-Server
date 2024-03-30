@@ -97,6 +97,7 @@ const changePassword = (req, res) => {
       });
     }
     const { username, date } = decoded;
+    console.log(decoded)
     const currentDate = moment();
     const dateToCompare = moment(date);
     const hoursDifference = currentDate.diff(dateToCompare, "hours");
@@ -110,6 +111,8 @@ const changePassword = (req, res) => {
         } else {
           bcrypt.genSalt(10, (err, salt) => {
             bcrypt.hash(password, salt, (err, hash) => {
+              console.log(err);
+              console.log(hash)
               if (err) throw err;
               User.update({ password: hash }, { where: { username } })
                 .then((user) => {
@@ -174,7 +177,7 @@ const create = (req, res) => {
                 },
                 process.env.JWT_SECRET,
                 {
-                  expiresIn: 3600,
+                  expiresIn:  "24h",
                 },
                 (err, token) => {
                   console.log(err);
@@ -324,7 +327,7 @@ const forgetPassword = (req, res) => {
           },
           process.env.JWT_SECRET,
           {
-            expiresIn: 3600,
+            expiresIn:  "24h",
           },
           (err, token) => {
             console.log(err);
@@ -421,7 +424,7 @@ const login = (req, res) => {
               payload,
               process.env.JWT_SECRET,
               {
-                expiresIn: 3600,
+                expiresIn:  "24h",
               },
               (err, token) => {
                 res.json({
