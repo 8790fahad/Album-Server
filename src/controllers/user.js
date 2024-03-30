@@ -86,6 +86,54 @@ const resetPassword = (req, res) => {
     .catch((err) => res.status(500).json({ err }));
 };
 
+const changePassword = (req, res) => {
+  const { token, password } = req.body;
+  jwt.verify(token, process.env.JWT_SECRET, (err, decoded) => {
+    if (err) {
+      return res.json({
+        success: false,
+        msg: "Failed to authenticate token.",
+        err,
+      });
+    }
+    const { username, date } = decoded;
+    const currentDate = moment();
+    const dateToCompare = moment(date);
+    const hoursDifference = currentDate.diff(dateToCompare, "hours");
+    if (hoursDifference >= 24) {
+      return res.json({ success: false, msg: "The link already expired" });
+    }
+    User.findAll({ where: { username } })
+      .then((user) => {
+        if (!user.length) {
+          return res.json({ success: false, msg: "user not found" });
+        } else {
+          bcrypt.genSalt(10, (err, salt) => {
+            bcrypt.hash(password, salt, (err, hash) => {
+              if (err) throw err;
+              User.update({ password: hash }, { where: { username } })
+                .then((user) => {
+                  res.json({
+                    success: true,
+                    msg: "Updated successfully",
+                    user: user,
+                  });
+                })
+                .catch((err) => {
+                  console.log(err);
+                  res.status(500).json({ err });
+                });
+            });
+          });
+        }
+      })
+      .catch((err) => {
+        console.log(err);
+        res.status(500).json({ err });
+      });
+  });
+};
+
 const create = (req, res) => {
   let {
     firstname = "",
@@ -142,10 +190,11 @@ const create = (req, res) => {
                       },
                     }),
                     function (error, info) {
+                      console.log(error, info);
                       if (error) {
                         res.status(500).json({
-                          success: true,
-                          message: "email sent",
+                          success: false,
+                          message: "email not sent",
                           error,
                         });
                       } else {
@@ -222,8 +271,98 @@ const deActivateAccount = (req, res) => {
     .then((user) => {
       res.json({ success: true, message: "Updated successfully", user });
     })
+    .catch((err) => res.status(500).json({ success: false, err }));
+};
+
+const updateUserInfo = (req, res) => {
+  const { username, phone, email, profession, marital_status, id } = req.body;
+  User.update(
+    { phone, email, profession, marital_status, username },
+    { where: { id } }
+  )
+    .then((user) => {
+      res.json({ success: true, message: "Updated successfully", user });
+    })
+    .catch((err) => res.status(500).json({ success: false, err }));
+};
+
+const updateUserSocial = (req, res) => {
+  const { facebook, instagram, twitter, snapchat, tikTok, whatsapp, username } =
+    req.body;
+  User.update(
+    { facebook, instagram, twitter, snapchat, tikTok, whatsapp },
+    { where: { username } }
+  )
+    .then((user) => {
+      res.json({ success: true, message: "Updated successfully", user });
+    })
+    .catch((err) => res.status(500).json({ success: false, err }));
+};
+
+const updateUserBasicInfo = (req, res) => {
+  const { firstname, lastname, location, about, username } = req.body;
+  User.update({ firstname, lastname, location, about }, { where: { username } })
+    .then((user) => {
+      res.json({ success: true, message: "Updated successfully", user });
+    })
+    .catch((err) => res.status(500).json({ success: false, err }));
+};
+
+const forgetPassword = (req, res) => {
+  const { username } = req.body;
+  User.findAll({ where: { username } })
+    .then((user) => {
+      if (!user.length) {
+        return res.json({ message: "username not available" });
+      } else {
+        const { username, email, firstname, lastname } = user[0].dataValues;
+        jwt.sign(
+          {
+            username,
+            email,
+            date: moment().format("YYYY-MM-DD hh:mm:ss"),
+          },
+          process.env.JWT_SECRET,
+          {
+            expiresIn: 3600,
+          },
+          (err, token) => {
+            console.log(err);
+            console.log(token);
+            transporter.sendMail(
+              mailOptions({
+                in_from: '"NEXIFOUR ALBUM" <from@example.com>',
+                in_to: email,
+                subject: "Password Recovery",
+                template_name: "ResetPassword",
+                context: {
+                  name: `${firstname} ${lastname}`,
+                  link: `https://album.nexifour.com/new-password/${token}`,
+                },
+              }),
+              function (error, info) {
+                if (error) {
+                  res.status(500).json({
+                    success: false,
+                    message: "email not sent",
+                    error,
+                  });
+                } else {
+                  res.status(200).json({
+                    success: true,
+                    message: "email sent",
+                    info: info.response,
+                  });
+                }
+              }
+            );
+          }
+        );
+      }
+    })
     .catch((err) => res.status(500).json({ err }));
 };
+
 const findByUsername = (req, res) => {
   const username = req.params.username;
   User.findAll({ where: { username } })
@@ -248,7 +387,12 @@ const login = (req, res) => {
   console.log(req.body);
   User.findAll({
     where: {
-      [Op.or]: [{ username: email }, { email }],
+      [Op.and]: [
+        {
+          [Op.or]: [{ username: email }, { email }],
+        },
+        { status: "verify" },
+      ],
     },
     limit: 1,
   })
@@ -358,4 +502,9 @@ export {
   resetPassword,
   verifyEmail,
   deActivateAccount,
+  forgetPassword,
+  changePassword,
+  updateUserBasicInfo,
+  updateUserInfo,
+  updateUserSocial
 };
