@@ -56,7 +56,7 @@ export default (sequelize, DataTypes) => {
         allowNull: false,
         defaultValue: "waiting", // Default value set to 'waiting'
         validate: {
-          isIn: [["verified", "suspended", "waiting"]], // Ensures status is one of these values
+          isIn: [["verified", "diactivated", "waiting"]], // Ensures status is one of these values
         },
       },
       marital_status: {

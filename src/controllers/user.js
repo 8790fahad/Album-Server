@@ -270,7 +270,7 @@ const verifyEmail = (req, res) => {
 };
 const deActivateAccount = (req, res) => {
   const { username } = req.body;
-  User.update({ status: "suspended" }, { where: { username } })
+  User.update({ status: "diactivated" }, { where: { username } })
     .then((user) => {
       res.json({ success: true, message: "Updated successfully", user });
     })
