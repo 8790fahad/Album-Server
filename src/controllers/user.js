@@ -97,7 +97,7 @@ const changePassword = (req, res) => {
       });
     }
     const { username, date } = decoded;
-    console.log(decoded)
+    console.log(decoded);
     const currentDate = moment();
     const dateToCompare = moment(date);
     const hoursDifference = currentDate.diff(dateToCompare, "hours");
@@ -112,7 +112,7 @@ const changePassword = (req, res) => {
           bcrypt.genSalt(10, (err, salt) => {
             bcrypt.hash(password, salt, (err, hash) => {
               console.log(err);
-              console.log(hash)
+              console.log(hash);
               if (err) throw err;
               User.update({ password: hash }, { where: { username } })
                 .then((user) => {
@@ -177,7 +177,7 @@ const create = (req, res) => {
                 },
                 process.env.JWT_SECRET,
                 {
-                  expiresIn:  "24h",
+                  expiresIn: "24h",
                 },
                 (err, token) => {
                   console.log(err);
@@ -327,7 +327,7 @@ const forgetPassword = (req, res) => {
           },
           process.env.JWT_SECRET,
           {
-            expiresIn:  "24h",
+            expiresIn: "24h",
           },
           (err, token) => {
             console.log(err);
@@ -394,16 +394,15 @@ const login = (req, res) => {
         {
           [Op.or]: [{ username: email }, { email }],
         },
-        { status: "verify" },
+        { status: "verified" },
       ],
     },
     limit: 1,
   })
     .then((user) => {
-      //check for user
       console.log(user);
       if (!user.length) {
-        errors.email = "User not found!";
+        errors.email = "User not found! or Not verify";
         return res.status(404).json(errors);
       }
 
@@ -424,7 +423,7 @@ const login = (req, res) => {
               payload,
               process.env.JWT_SECRET,
               {
-                expiresIn:  "24h",
+                expiresIn: "24h",
               },
               (err, token) => {
                 res.json({
@@ -509,5 +508,5 @@ export {
   changePassword,
   updateUserBasicInfo,
   updateUserInfo,
-  updateUserSocial
+  updateUserSocial,
 };
