@@ -402,7 +402,7 @@ const login = (req, res) => {
     .then((user) => {
       console.log(user);
       if (!user.length) {
-        errors.email = "User not found! or Not verify";
+        errors.email = "User not found or verified";
         return res.status(404).json(errors);
       }
 
