@@ -36,8 +36,8 @@ const verifyToken = (req, res) => {
         err,
       });
     }
-    const { username } = decoded;
-    User.findAll({ where: { username } })
+    const { id } = decoded;
+    User.findAll({ where: { id } })
       .then((user) => {
         if (!user.length) {
           return res.json({ msg: "user not found" });
@@ -278,9 +278,21 @@ const deActivateAccount = (req, res) => {
 };
 
 const updateUserInfo = (req, res) => {
-  const { username, phone, email, profession, marital_status, id } = req.body;
+  const { username, phone, email, profession, marital_status } = req.body;
   User.update(
-    { phone, email, profession, marital_status, username },
+    { phone, email, profession, marital_status },
+    { where: { username } }
+  )
+    .then((user) => {
+      res.json({ success: true, message: "Updated successfully", user });
+    })
+    .catch((err) => res.status(500).json({ success: false, err }));
+};
+
+const changeUsername = (req, res) => {
+  const { username,id } = req.body;
+  User.update(
+    { username },
     { where: { id } }
   )
     .then((user) => {
@@ -403,6 +415,7 @@ const login = (req, res) => {
       console.log(user);
       if (!user.length) {
         errors.email = "User not found or verified";
+        x;
         return res.status(404).json(errors);
       }
 
@@ -449,6 +462,32 @@ const findAllUsers = (req, res) => {
   User.findAll()
     .then((user) => {
       res.json({ user });
+    })
+    .catch((err) => res.status(500).json({ err }));
+};
+
+const searchUser = (req, res) => {
+  const { user = "" } = req.query;
+  User.findAll({
+    where: {
+      [Op.or]: [
+        { phone: { [Op.like]: `%${user}%` } },
+        { username: { [Op.like]: `%${user}%` } },
+        db.sequelize.where(
+          db.sequelize.fn(
+            "concat",
+            db.sequelize.col("firstname"),
+            " ",
+            db.sequelize.col("lastname")
+          ),
+          { [Op.like]: `%${user}%` }
+        ),
+      ],
+    },
+    limit: 5,
+  })
+    .then((user) => {
+      res.json({ results: user });
     })
     .catch((err) => res.status(500).json({ err }));
 };
@@ -509,4 +548,6 @@ export {
   updateUserBasicInfo,
   updateUserInfo,
   updateUserSocial,
+  searchUser,
+  changeUsername
 };

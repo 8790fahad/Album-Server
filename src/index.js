@@ -47,8 +47,7 @@ const handlebarsOptions = {
 };
 transporter.use("compile", hbs(handlebarsOptions));
 export {transporter}
-// force: true will drop the table if it already exits
-// models.sequelize.sync({ force: true }).then(() => {
+
 models.sequelize.sync().then(() => {
   console.log("Drop and Resync with {force: true}");
 });

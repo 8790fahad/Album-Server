@@ -17,6 +17,8 @@ import {
   updateUserBasicInfo,
   updateUserInfo,
   updateUserSocial,
+  searchUser,
+  changeUsername,
 } from "../controllers/user";
 
 module.exports = (app) => {
@@ -26,6 +28,7 @@ module.exports = (app) => {
 
   // user login
   app.post("/api/users/login", login);
+  app.get("/api/users/search-user", searchUser);
 
   //retrieve all users
   // app.get(
@@ -51,10 +54,10 @@ module.exports = (app) => {
   app.put("/api/users/change-password", changePassword);
   app.put("/api/users/de-activate-account", deActivateAccount);
   app.post("/api/users/forget-password", forgetPassword);
-  app.put("/api/users/update-user-basic-info",updateUserBasicInfo)
-  app.put("/api/users/update-user-info",updateUserInfo)
-  app.put("/api/users/update-user-social",updateUserSocial)  
-  // update a user with id
+  app.put("/api/users/update-user-basic-info", updateUserBasicInfo);
+  app.put("/api/users/update-user-info", updateUserInfo);
+  app.put("/api/users/change-username",changeUsername)
+  app.put("/api/users/update-user-social", updateUserSocial);
   app.put(
     "/api/users/:userId",
     passport.authenticate("jwt", {
